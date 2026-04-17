@@ -5191,9 +5191,8 @@
           await _supabase.from('contact_messages').insert([payload]);
 
           // 2. Send Email via existing endpoint
-          const contactUrl = (location.protocol === 'file:')
-            ? 'http://localhost:3000/contact'
-            : '/contact';
+             // Send directly to your deployed Render backend
+      const contactUrl = 'https://sai-praneeth-s-portfolio-1.onrender.com/contact';
 
           await fetch(contactUrl, {
             method: 'POST',
