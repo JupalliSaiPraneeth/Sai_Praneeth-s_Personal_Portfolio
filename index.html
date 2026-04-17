@@ -785,6 +785,8 @@
         flex-direction: column;
         padding: 16px 12px;
         gap: 16px;
+        height: auto;
+        overflow: visible;
       }
 
       .sidebar {
@@ -820,6 +822,39 @@
       .main {
         width: 100%;
         order: 2;
+        height: auto;
+        overflow-y: visible;
+      }
+
+      .contacts-toggle,
+      .contacts-list {
+        display: none !important;
+      }
+
+      /* Reduce profile grid height on mobile */
+      body:has(.tab-panel.active) .sidebar,
+      .tab-panel.active~.sidebar,
+      .main:has(.tab-panel.active) .sidebar {
+        padding: 14px 18px 14px !important;
+        gap: 10px !important;
+      }
+
+      .avatar-wrap {
+        margin-bottom: 6px !important;
+      }
+
+      .sidebar-name {
+        font-size: 1.05rem !important;
+        margin-bottom: 4px !important;
+      }
+
+      .sidebar-title {
+        font-size: 0.65rem !important;
+        padding: 3px 10px !important;
+      }
+
+      .sidebar-socials {
+        margin-top: 0px !important;
       }
 
       .mobile-menu-toggle {
@@ -1905,7 +1940,7 @@
       position: relative;
       z-index: 1;
       display: flex;
-      min-height: 100vh;
+      height: 100vh;
       max-width: 1300px;
       margin: 0 auto;
       padding: 28px 20px;
@@ -1918,7 +1953,8 @@
       width: var(--sidebar-w);
       min-width: var(--sidebar-w);
       position: sticky;
-      top: 28px;
+      top: 0;
+      height: fit-content;
       max-height: calc(100vh - 56px);
       overflow-y: auto;
       background: var(--bg2);
@@ -1934,6 +1970,7 @@
       visibility: hidden;
       transform: translateX(-30px);
       pointer-events: none;
+      flex-shrink: 0;
     }
 
     .sidebar.visible {
@@ -1947,16 +1984,185 @@
       transition: background 0.45s, border-color 0.45s, box-shadow 0.45s, opacity 0.4s, visibility 0.4s, transform 0.4s;
     }
 
+    /* ══ SIDEBAR HOLOGRAPHIC BORDER RING ══ */
     .sidebar::before {
       content: '';
       position: absolute;
-      top: 0;
+      inset: -2px;
+      border-radius: calc(var(--r) + 2px);
+      background: conic-gradient(from var(--sidebar-angle, 0deg),
+          var(--accent) 0%,
+          #ff6bdf 15%,
+          #4d96ff 30%,
+          #6bcb77 45%,
+          var(--accent2) 60%,
+          #ff6b6b 75%,
+          var(--accent) 100%);
+      animation: holoSpin 4s linear infinite;
+      z-index: -1;
+      opacity: 0.85;
+      transition: opacity 0.4s;
+    }
+
+    .sidebar::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: var(--r);
+      background: var(--bg2);
+      z-index: -1;
+    }
+
+    @keyframes holoSpin {
+      0% {
+        --sidebar-angle: 0deg;
+      }
+
+      100% {
+        --sidebar-angle: 360deg;
+      }
+    }
+
+    @property --sidebar-angle {
+      syntax: '<angle>';
+      initial-value: 0deg;
+      inherits: false;
+    }
+
+    /* Scanline sweep */
+    .sidebar-scanline {
+      position: absolute;
+      top: -4px;
       left: 0;
       right: 0;
-      height: 2.5px;
-      background: linear-gradient(90deg, transparent, var(--accent), var(--accent2), var(--accent), transparent);
-      border-radius: var(--r) var(--r) 0 0;
-      transition: background 0.45s;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, var(--accent), rgba(255, 255, 255, 0.9), var(--accent), transparent);
+      border-radius: 2px;
+      box-shadow: 0 0 12px var(--accent-glow), 0 0 24px var(--accent-glow);
+      animation: scanSweep 4s ease-in-out infinite;
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    @keyframes scanSweep {
+      0% {
+        top: 0%;
+        opacity: 0;
+      }
+
+      5% {
+        opacity: 1;
+      }
+
+      95% {
+        opacity: 1;
+      }
+
+      100% {
+        top: 100%;
+        opacity: 0;
+      }
+    }
+
+    /* Corner sparks */
+    .sidebar-corner {
+      position: absolute;
+      width: 18px;
+      height: 18px;
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    .sidebar-corner::before,
+    .sidebar-corner::after {
+      content: '';
+      position: absolute;
+      background: var(--accent);
+      box-shadow: 0 0 6px var(--accent), 0 0 12px var(--accent-glow);
+      border-radius: 2px;
+      animation: sparkPulse 2s ease-in-out infinite;
+    }
+
+    .sidebar-corner::before {
+      width: 100%;
+      height: 2px;
+      top: 0;
+      left: 0;
+    }
+
+    .sidebar-corner::after {
+      width: 2px;
+      height: 100%;
+      top: 0;
+      left: 0;
+    }
+
+    .sidebar-corner--tl {
+      top: 6px;
+      left: 6px;
+    }
+
+    .sidebar-corner--tr {
+      top: 6px;
+      right: 6px;
+      transform: scaleX(-1);
+    }
+
+    .sidebar-corner--bl {
+      bottom: 6px;
+      left: 6px;
+      transform: scaleY(-1);
+    }
+
+    .sidebar-corner--br {
+      bottom: 6px;
+      right: 6px;
+      transform: scale(-1);
+    }
+
+    @keyframes sparkPulse {
+
+      0%,
+      100% {
+        opacity: 1;
+        box-shadow: 0 0 6px var(--accent);
+      }
+
+      50% {
+        opacity: 0.4;
+        box-shadow: 0 0 16px var(--accent), 0 0 32px var(--accent-glow);
+      }
+    }
+
+    /* Aura pulse rings */
+    .sidebar-aura {
+      position: absolute;
+      inset: -12px;
+      border-radius: calc(var(--r) + 12px);
+      border: 1px solid var(--accent-glow);
+      pointer-events: none;
+      animation: auraPulse 3s ease-out infinite;
+      z-index: -2;
+    }
+
+    .sidebar-aura:nth-child(2) {
+      animation-delay: 1s;
+    }
+
+    .sidebar-aura:nth-child(3) {
+      animation-delay: 2s;
+    }
+
+    @keyframes auraPulse {
+      0% {
+        transform: scale(1);
+        opacity: 0.6;
+      }
+
+      100% {
+        transform: scale(1.08);
+        opacity: 0;
+      }
     }
 
     .avatar-wrap {
@@ -2211,6 +2417,11 @@
     .main {
       flex: 1;
       min-width: 0;
+      height: calc(100vh - 56px);
+      overflow-y: auto;
+      overflow-x: hidden;
+      scrollbar-width: thin;
+      scrollbar-color: var(--bg4) transparent;
     }
 
     .tab-nav {
@@ -3888,6 +4099,15 @@
 
     <!-- ══════════ SIDEBAR ══════════ -->
     <aside class="sidebar" id="sidebar">
+      <!-- Holographic animation elements -->
+      <div class="sidebar-scanline" aria-hidden="true"></div>
+      <div class="sidebar-corner sidebar-corner--tl" aria-hidden="true"></div>
+      <div class="sidebar-corner sidebar-corner--tr" aria-hidden="true"></div>
+      <div class="sidebar-corner sidebar-corner--bl" aria-hidden="true"></div>
+      <div class="sidebar-corner sidebar-corner--br" aria-hidden="true"></div>
+      <div class="sidebar-aura" aria-hidden="true"></div>
+      <div class="sidebar-aura" aria-hidden="true"></div>
+      <div class="sidebar-aura" aria-hidden="true"></div>
       <div class="sidebar__top">
         <div class="avatar-wrap">
           <div class="avatar-ring">
@@ -4345,7 +4565,7 @@
             class="p-card reveal interactive-project" data-cat="frontend">
             <div class="p-card__img">
               <img src="college_P.png" alt="My College Website" loading="lazy">
-              <video class="p-card-video" src="college_V.mp4" muted loop playsinline></video>
+              <video class="p-card-video" data-src="college_V.mp4" muted loop playsinline></video>
               <button class="zoom-btn" aria-label="Fullscreen zoom"><i class="bx bx-fullscreen"></i></button>
               <div class="p-card__overlay"><i class="bx bx-expand"></i><span>View Demo</span></div><span
                 class="p-badge p-badge--fe">FE</span>
@@ -4361,7 +4581,7 @@
             class="p-card reveal interactive-project" data-cat="frontend">
             <div class="p-card__img">
               <img src="netflix_P.png" alt="Netflix Clone" loading="lazy">
-              <video class="p-card-video" src="netflix_V.mp4" muted loop playsinline></video>
+              <video class="p-card-video" data-src="netflix_V.mp4" muted loop playsinline></video>
               <button class="zoom-btn" aria-label="Fullscreen zoom"><i class="bx bx-fullscreen"></i></button>
               <div class="p-card__overlay"><i class="bx bx-expand"></i><span>View Demo</span></div><span
                 class="p-badge p-badge--fe">FE</span>
@@ -4377,7 +4597,7 @@
             class="p-card reveal interactive-project" data-cat="frontend">
             <div class="p-card__img">
               <img src="ben_P.png" alt="Character Expo" loading="lazy">
-              <video class="p-card-video" src="ben_V.mp4" muted loop playsinline></video>
+              <video class="p-card-video" data-src="ben_V.mp4" muted loop playsinline></video>
               <button class="zoom-btn" aria-label="Fullscreen zoom"><i class="bx bx-fullscreen"></i></button>
               <div class="p-card__overlay"><i class="bx bx-expand"></i><span>View Demo</span></div><span
                 class="p-badge p-badge--fe">FE</span>
@@ -4393,7 +4613,7 @@
             class="p-card reveal interactive-project" data-cat="fullstack">
             <div class="p-card__img">
               <img src="compiler_P.png" alt="PatchIt" loading="lazy">
-              <video class="p-card-video" src="compiler_V.mp4" muted loop playsinline></video>
+              <video class="p-card-video" data-src="compiler_V.mp4" muted loop playsinline></video>
 
               <div class="p-card__overlay"><i class="bx bx-expand"></i><span>View Demo</span></div><span
                 class="p-badge p-badge--fs">FS</span>
@@ -4408,7 +4628,7 @@
           <a href="https://www.linkedin.com/feed/update/urn:li:activity:7374681733188800512/" target="_blank"
             rel="noopener" class="p-card reveal interactive-project" data-cat="fullstack">
             <div class="p-card__img"><img src="mega.png" alt="Usha Store" loading="lazy">
-              <video class="p-card-video" src="usha-store_V.mp4" muted loop playsinline></video>
+              <video class="p-card-video" data-src="usha-store_V.mp4" muted loop playsinline></video>
               <div class="p-card__overlay"><i class="bx bx-expand"></i><span>View Demo</span></div><span
                 class="p-badge p-badge--fs">FS</span>
             </div>
@@ -4423,7 +4643,7 @@
           <a href="https://www.linkedin.com/posts/saipraneeth-jupalli-6999432ba_webdevelopment-activity-7382818932988121089-Jg-m"
             target="_blank" rel="noopener" class="p-card reveal interactive-project" data-cat="fullstack">
             <div class="p-card__img"><img src="chat.png" alt="Chat Burst" loading="lazy">
-              <video class="p-card-video" src="chatting_V.mp4" muted loop playsinline></video>
+              <video class="p-card-video" data-src="chatting_V.mp4" muted loop playsinline></video>
               <div class="p-card__overlay"><i class="bx bx-expand"></i><span>View Demo</span></div><span
                 class="p-badge p-badge--fs">FS</span>
             </div>
@@ -4438,7 +4658,7 @@
           <a href="https://www.linkedin.com/posts/saipraneeth-jupalli-6999432ba_hey-developers-hope-you-gonna-make-your-activity-7409835234202120192-SeT6"
             target="_blank" rel="noopener" class="p-card reveal interactive-project" data-cat="frontend">
             <div class="p-card__img"><img src="resume.png" alt="Career Builder" loading="lazy">
-              <video class="p-card-video" src="resume_V.mp4" muted loop playsinline></video>
+              <video class="p-card-video" data-src="resume_V.mp4" muted loop playsinline></video>
               <div class="p-card__overlay"><i class="bx bx-expand"></i><span>View Demo</span></div><span
                 class="p-badge p-badge--fe">FE</span>
             </div>
@@ -4453,7 +4673,7 @@
           <a href="https://lnkd.in/drwJieXU" target="_blank" rel="noopener" class="p-card reveal interactive-project"
             data-cat="frontend">
             <div class="p-card__img"><img src="manny.png" alt="Only Here" loading="lazy">
-              <video class="p-card-video" src="storybook_V.mp4" muted loop playsinline></video>
+              <video class="p-card-video" data-src="storybook_V.mp4" muted loop playsinline></video>
               <div class="p-card__overlay"><i class="bx bx-expand"></i><span>View Demo</span></div><span
                 class="p-badge p-badge--fe">FE</span>
             </div>
@@ -4468,7 +4688,7 @@
           <a href="https://lnkd.in/dFZgQ4Hu" target="_blank" rel="noopener" class="p-card reveal interactive-project"
             data-cat="frontend">
             <div class="p-card__img"><img src="fest.png" alt="MarKDowN FestivaL" loading="lazy">
-              <video class="p-card-video" src="calender_V.mp4" muted loop playsinline></video>
+              <video class="p-card-video" data-src="calender_V.mp4" muted loop playsinline></video>
               <div class="p-card__overlay"><i class="bx bx-expand"></i><span>View Demo</span></div><span
                 class="p-badge p-badge--fe">FE</span>
             </div>
@@ -4483,7 +4703,7 @@
           <a href="https://www.linkedin.com/feed/update/urn:li:activity:7356141841919946752/" target="_blank"
             rel="noopener" class="p-card reveal interactive-project" data-cat="frontend">
             <div class="p-card__img"><img src="landing_P.png" alt="First Landing Page" loading="lazy">
-              <video class="p-card-video" src="landingpage_V.mp4" muted loop playsinline></video>
+              <video class="p-card-video" data-src="landingpage_V.mp4" muted loop playsinline></video>
               <div class="p-card__overlay"><i class="bx bx-expand"></i><span>View Demo</span></div><span
                 class="p-badge p-badge--fe">FE</span>
             </div>
@@ -5574,6 +5794,28 @@
       });
     })();
 
+    /* Sidebar 3D Holographic Tilt */
+    (function initSidebarTilt() {
+      if (matchMedia('(pointer: coarse)').matches) return;
+      const sidebar = document.getElementById('sidebar');
+      if (!sidebar) return;
+      sidebar.style.transition = 'transform 0.12s ease-out, box-shadow 0.3s';
+      sidebar.style.willChange = 'transform';
+      sidebar.addEventListener('mousemove', e => {
+        const rect = sidebar.getBoundingClientRect();
+        const cx = rect.left + rect.width / 2;
+        const cy = rect.top + rect.height / 2;
+        const dx = (e.clientX - cx) / (rect.width / 2);
+        const dy = (e.clientY - cy) / (rect.height / 2);
+        const rotX = -dy * 6;
+        const rotY = dx * 6;
+        sidebar.style.transform = `perspective(800px) rotateX(${rotX}deg) rotateY(${rotY}deg) scale3d(1.02,1.02,1.02)`;
+      });
+      sidebar.addEventListener('mouseleave', () => {
+        sidebar.style.transform = 'perspective(800px) rotateX(0deg) rotateY(0deg) scale3d(1,1,1)';
+      });
+    })();
+
     /* Spotlight Glow */
     (function initSpotlight() {
       if (matchMedia('(pointer: coarse)').matches) return;
@@ -5862,6 +6104,8 @@
             if (!video) return;
 
             if (entry.isIntersecting) {
+              // Lazy-load: inject src only on first scroll-into-view
+              if (!video.src && video.dataset.src) video.src = video.dataset.src;
               if (currentPlaying && currentPlaying !== video) {
                 currentPlaying.pause();
                 currentPlaying.closest('.interactive-project').classList.remove('is-touch-playing');
@@ -5884,18 +6128,24 @@
         const video = card.querySelector('.p-card-video');
         if (!video) return;
 
-        video.load();
+        // Lazy-load: inject src only on first interaction (prevents 404 on page load)
+        function loadVideoSrc() {
+          if (!video.src && video.dataset.src) video.src = video.dataset.src;
+        }
+
         video.addEventListener('canplay', () => video.classList.add('is-ready'), { once: true });
+        video.addEventListener('error', () => { /* silently ignore missing/LFS videos */ });
 
         if (isTouch) {
           observer.observe(card);
         } else {
           card.addEventListener('mouseenter', () => {
+            loadVideoSrc();
             cards.forEach(c => {
               const v = c.querySelector('.p-card-video');
               if (v && v !== video && !v.paused) v.pause();
             });
-            video.play().catch(e => console.warn('Autoplay prevented:', e));
+            video.play().catch(() => { });
           });
 
           card.addEventListener('mouseleave', () => {
@@ -5920,12 +6170,15 @@
           document.documentElement.style.setProperty('--click-x', (clientX || window.innerWidth / 2) + 'px');
           document.documentElement.style.setProperty('--click-y', (clientY || window.innerHeight / 2) + 'px');
 
-          const vSrc = video.getAttribute('src');
+          const vSrc = video.src || video.dataset.src;
           const titleEl = card.querySelector('[data-title]');
           const descEl = card.querySelector('[data-desc]');
           const link = card.getAttribute('href');
 
-          if (vSrc) modalVideo.src = vSrc;
+          if (vSrc) {
+            if (!video.src && video.dataset.src) video.src = video.dataset.src;
+            modalVideo.src = vSrc;
+          }
           if (titleEl) modalTitle.textContent = titleEl.textContent;
           if (descEl) modalDesc.textContent = descEl.textContent;
           if (link) modalLink.href = link;
