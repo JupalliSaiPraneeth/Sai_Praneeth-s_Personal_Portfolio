@@ -5517,7 +5517,7 @@
           await _supabase.from('contact_messages').insert([payload]);
 
           // 2. Send Email via existing endpoint
-            // Send directly to your deployed Render backend
+           // Send directly to your deployed Render backend
       const contactUrl = 'https://sai-praneeth-s-portfolio-1.onrender.com/contact';
 
           await fetch(contactUrl, {
@@ -6247,11 +6247,25 @@
             
             // Also set direct src as fallback
             video.src = video.dataset.src;
+            
+            console.log('📹 Loading video:', video.dataset.src);
           }
         }
 
-        video.addEventListener('canplay', () => video.classList.add('is-ready'), { once: true });
-        video.addEventListener('error', (e) => { console.warn('Video load error:', video.dataset.src, e); });
+        video.addEventListener('canplay', () => {
+          video.classList.add('is-ready');
+          console.log('✅ Video ready:', video.dataset.src);
+        }, { once: true });
+        
+        video.addEventListener('error', (e) => {
+          console.error('❌ Video load error:', {
+            filename: video.dataset.src,
+            videoSrc: video.src,
+            networkState: video.networkState,
+            error: video.error,
+            errorCode: video.error?.code
+          });
+        });
 
         if (isTouch) {
           observer.observe(card);
