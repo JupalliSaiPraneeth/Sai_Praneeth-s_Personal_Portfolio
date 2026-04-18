@@ -3,7 +3,8 @@
 
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
   <meta name="color-scheme" content="dark light">
   <meta name="description" content="SaiPraneeth Jupalli — Frontend Developer, Data Scientist & Web Designer.">
   <title>SaiPraneeth Jupalli | Portfolio</title>
@@ -825,6 +826,20 @@
         order: 2;
         height: auto;
         overflow-y: visible;
+        padding-top: 0;
+      }
+
+      .mobile-header {
+        display: flex !important;
+        align-items: center;
+        justify-content: flex-end;
+        position: sticky !important;
+        top: 0 !important;
+        width: 100% !important;
+        padding: 0 20px !important;
+        background: transparent !important;
+        z-index: 1000 !important;
+        border-bottom: none !important;
       }
 
       .contacts-toggle,
@@ -860,19 +875,19 @@
 
       .mobile-menu-toggle {
         display: flex !important;
-        position: fixed !important;
-        top: 20px !important;
-        right: 20px !important;
-        width: 48px !important;
-        height: 48px !important;
-        border-radius: 12px !important;
+        position: relative !important;
+        top: auto !important;
+        right: auto !important;
+        width: 44px !important;
+        height: 44px !important;
+        border-radius: 10px !important;
         background: var(--accent) !important;
         border: none !important;
         color: var(--bg) !important;
-        font-size: 1.3rem !important;
+        font-size: 1.25rem !important;
         align-items: center !important;
         justify-content: center !important;
-        box-shadow: 0 4px 20px var(--accent-glow) !important;
+        box-shadow: 0 4px 16px var(--accent-glow) !important;
         z-index: 1001 !important;
         cursor: pointer !important;
         transition: all 0.3s var(--ease) !important;
@@ -4199,8 +4214,10 @@
     <!-- ══════════ MAIN ══════════ -->
     <main class="main">
 
-      <button class="mobile-menu-toggle" id="mobile-menu-toggle" aria-label="Toggle menu"><i
-          class="bx bx-menu"></i></button>
+      <div class="mobile-header">
+        <button class="mobile-menu-toggle" id="mobile-menu-toggle" aria-label="Toggle menu"><i
+            class="bx bx-menu"></i></button>
+      </div>
       <div class="mobile-nav-overlay" id="mobile-nav-overlay"></div>
       <div class="mobile-nav-menu" id="mobile-nav-menu">
         <button class="mobile-nav-close" id="mobile-nav-close" aria-label="Close menu"><i class="bx bx-x"></i></button>
@@ -5439,7 +5456,7 @@
           await _supabase.from('contact_messages').insert([payload]);
 
           // 2. Send Email via existing endpoint
-            // Send directly to your deployed Render backend
+             // Send directly to your deployed Render backend
       const contactUrl = 'https://sai-praneeth-s-portfolio-1.onrender.com/contact';
 
           await fetch(contactUrl, {
