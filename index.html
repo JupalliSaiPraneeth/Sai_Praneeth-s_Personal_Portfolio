@@ -1345,25 +1345,21 @@
 
       .hero-badges {
         position: absolute;
-        right: -40px;
+        right: -80px;
         top: 50%;
-        transform: translateY(-50%);
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
+        width: 320px;
+        height: 320px;
+        transform: translate(0, -50%);
+        display: block;
         z-index: 3;
-        width: auto !important;
-        height: auto !important;
-        left: auto !important;
       }
 
       .hero-badge {
-        position: static !important;
-        transform: none !important;
+        position: absolute !important;
         animation: slideInFromRight 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
         animation-delay: calc(0.7s + (var(--badge-index, 0) * 0.1s)) !important;
         animation-fill-mode: both !important;
-        transition: all 0.3s ease-out !important;
+        transition: top 1s cubic-bezier(0.34, 1.56, 0.64, 1), right 1s cubic-bezier(0.34, 1.56, 0.64, 1), transform 0.3s ease-out !important;
         display: flex !important;
         align-items: center !important;
         gap: 8px !important;
@@ -1376,6 +1372,23 @@
         color: var(--accent) !important;
         white-space: nowrap !important;
         pointer-events: auto !important;
+        width: fit-content !important;
+      }
+
+      /* Desktop orbiting badge coordinates */
+      .hero-badge[data-pos="0"] {
+        top: 10%;
+        right: 5%;
+      }
+
+      .hero-badge[data-pos="1"] {
+        top: 50%;
+        right: 75%;
+      }
+
+      .hero-badge[data-pos="2"] {
+        top: 90%;
+        right: 20%;
       }
 
       .hero-badge:hover {
@@ -3538,7 +3551,7 @@
       }
 
       .hero-section {
-        padding: 40px 0;
+        padding: 10px 0 40px 0;
         margin-bottom: 30px;
       }
 
@@ -4218,15 +4231,6 @@
         <button class="mobile-menu-toggle" id="mobile-menu-toggle" aria-label="Toggle menu"><i
             class="bx bx-menu"></i></button>
       </div>
-      <div class="mobile-nav-overlay" id="mobile-nav-overlay"></div>
-      <div class="mobile-nav-menu" id="mobile-nav-menu">
-        <button class="mobile-nav-close" id="mobile-nav-close" aria-label="Close menu"><i class="bx bx-x"></i></button>
-        <button class="tab-btn" data-tab="about"><i class="bx bx-user"></i> About</button>
-        <button class="tab-btn" data-tab="resume"><i class="bx bx-file-blank"></i> Resume</button>
-        <button class="tab-btn" data-tab="skills"><i class="bx bx-code-curly"></i> Skills</button>
-        <button class="tab-btn" data-tab="portfolio"><i class="bx bx-briefcase"></i> Portfolio</button>
-        <button class="tab-btn" data-tab="contact"><i class="bx bx-message-square-dots"></i> Contact</button>
-      </div>
 
       <nav class="tab-nav" id="tab-nav" role="navigation" aria-label="Portfolio sections">
         <button class="tab-btn" data-tab="about"><i class="bx bx-user"></i> About</button>
@@ -4756,7 +4760,7 @@
               <h3 class="p-title" data-title>First Landing Page</h3>
               <p class="p-desc" data-desc>My first landing page based on a Travelling Website!
               </p>
-              <div class="p-stack"><span>HTML</span><span></span><span></span></div>
+              <div class="p-stack"><span>HTML</span></div>
             </div>
           </a>
           <a href="https://github.com/JupalliSaiPraneeth/-The-Art-of-Clustering-From-Chaos-to-Clarity-" target="_blank"
@@ -4873,12 +4877,23 @@
               <span id="submit-label">Send Message</span>
               <i class="bx bx-send" id="submit-icon"></i>
             </button>
-            <p class="form-note">I'll respond within 24 hours ⚡</p>
+            <p class="form-note">I'll respond within 24 hours </p>
           </form>
         </div>
       </div>
 
     </main>
+
+    <!-- ══ MOBILE NAV (FIXED OUTSIDE MAIN) ══ -->
+    <div class="mobile-nav-overlay" id="mobile-nav-overlay"></div>
+    <div class="mobile-nav-menu" id="mobile-nav-menu">
+      <button class="mobile-nav-close" id="mobile-nav-close" aria-label="Close menu"><i class="bx bx-x"></i></button>
+      <button class="tab-btn" data-tab="about"><i class="bx bx-user"></i> About</button>
+      <button class="tab-btn" data-tab="resume"><i class="bx bx-file-blank"></i> Resume</button>
+      <button class="tab-btn" data-tab="skills"><i class="bx bx-code-curly"></i> Skills</button>
+      <button class="tab-btn" data-tab="portfolio"><i class="bx bx-briefcase"></i> Portfolio</button>
+      <button class="tab-btn" data-tab="contact"><i class="bx bx-message-square-dots"></i> Contact</button>
+    </div>
   </div>
 
   <!-- ══ LIKE BUTTON ══ -->
@@ -5230,6 +5245,19 @@
     const { createClient } = supabase;
     const _supabase = createClient(SUPABASE_URL, SUPABASE_ANON);
 
+    /* ══ GENERATE UNIQUE BROWSER ID ══ */
+    function generateBrowserId() {
+      let browserId = localStorage.getItem('sp-browser-id');
+      if (!browserId) {
+        // Create unique ID from browser fingerprint data
+        const fingerprint = navigator.userAgent + navigator.language + screen.width + screen.height + new Date().getTimezoneOffset();
+        const hash = Array.from(fingerprint).reduce((acc, char) => ((acc << 5) - acc) + char.charCodeAt(0), 0).toString(16).substring(0, 8);
+        browserId = `browser-${hash}-${Date.now().toString(36)}`;
+        localStorage.setItem('sp-browser-id', browserId);
+      }
+      return browserId;
+    }
+
     /* ══ REALTIME LIKES ══ */
     (function initRealtimeLikes() {
       const likeBtn = document.getElementById('like-fab');
@@ -5270,18 +5298,19 @@
       }
 
       async function fetchLikes() {
-        const { data, error } = await _supabase.from('likes').select('count').eq('id', 1).single();
-        if (!error && data) updateLikeCount(data.count);
+        const { data, error } = await _supabase.from('likes').select('id', { count: 'exact' });
+        if (!error && data) updateLikeCount(data.length);
         else updateLikeCount(0);
       }
       fetchLikes();
 
       _supabase.channel('public:likes')
-        .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'likes' }, payload => {
-          if (payload.new && payload.new.id === 1) updateLikeCount(payload.new.count);
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'likes' }, payload => {
+          fetchLikes();
         }).subscribe();
 
       let hasLiked = localStorage.getItem('sp-has-liked') === 'true';
+      let userEmail = localStorage.getItem('sp-user-email') || '';
       if (hasLiked) likeBtn.classList.add('has-liked');
 
       likeBtn.addEventListener('click', async (e) => {
@@ -5295,13 +5324,37 @@
 
           updateLikeCount(Math.max(0, currentVal - 1));
 
-          const { data: fetchD } = await _supabase.from('likes').select('count').eq('id', 1).single();
-          if (fetchD && fetchD.count > 0) {
-            await _supabase.from('likes').update({ count: fetchD.count - 1 }).eq('id', 1);
+          // Remove like from database
+          if (userEmail) {
+            await _supabase.from('likes').delete().eq('email', userEmail);
           }
         } else {
+          // Auto-generate browser identifier
+          const email = generateBrowserId();
+          
+          // Check if this browser already liked
+          const { data: existingLike } = await _supabase.from('likes').select('id').eq('email', email).single();
+          
+          if (existingLike) {
+            hasLiked = true;
+            localStorage.setItem('sp-has-liked', 'true');
+            localStorage.setItem('sp-user-email', email);
+            likeBtn.classList.add('has-liked');
+            
+            const msgEl = document.getElementById('like-msg');
+            if (msgEl) {
+              msgEl.textContent = 'You already liked this! 💖';
+              msgEl.classList.remove('show');
+              void msgEl.offsetWidth;
+              msgEl.classList.add('show');
+            }
+            return;
+          }
+
           hasLiked = true;
+          userEmail = email;
           localStorage.setItem('sp-has-liked', 'true');
+          localStorage.setItem('sp-user-email', email);
           likeBtn.classList.add('has-liked');
 
           // Reflow trick to replay CSS animation instantly
@@ -5351,11 +5404,18 @@
             }
           });
 
-          updateLikeCount(currentVal + 1);
+          // Add like to database
+          const { data: newLike, error: insertError } = await _supabase.from('likes').insert({
+            email: email,
+            created_at: new Date().toISOString()
+          }).select();
 
-          const { data: fetchD } = await _supabase.from('likes').select('count').eq('id', 1).single();
-          if (fetchD) {
-            await _supabase.from('likes').update({ count: fetchD.count + 1 }).eq('id', 1);
+          if (!insertError) {
+            // Fetch total count
+            const { data: allLikes } = await _supabase.from('likes').select('id', { count: 'exact' });
+            updateLikeCount(allLikes?.length || currentVal + 1);
+          } else {
+            updateLikeCount(currentVal + 1);
           }
         }
       });
