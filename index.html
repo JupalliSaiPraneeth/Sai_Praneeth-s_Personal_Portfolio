@@ -8,6 +8,7 @@
   <meta name="color-scheme" content="dark light">
   <meta name="description" content="SaiPraneeth Jupalli — Frontend Developer, Data Scientist & Web Designer.">
   <title>SaiPraneeth Jupalli | Portfolio</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='48' fill='%2300c97d'/><text x='50' y='70' font-size='60' font-weight='bold' text-anchor='middle' fill='white' font-family='Arial'>S</text></svg>" />
   <link
     href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:wght@400;600;700&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@300;400;500;600;700&family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500;600&family=Manrope:wght@300;400;500;600&display=swap"
     rel="stylesheet">
@@ -5516,7 +5517,7 @@
           await _supabase.from('contact_messages').insert([payload]);
 
           // 2. Send Email via existing endpoint
-             // Send directly to your deployed Render backend
+            // Send directly to your deployed Render backend
       const contactUrl = 'https://sai-praneeth-s-portfolio-1.onrender.com/contact';
 
           await fetch(contactUrl, {
@@ -6235,11 +6236,22 @@
 
         // Lazy-load: inject src only on first interaction (prevents 404 on page load)
         function loadVideoSrc() {
-          if (!video.src && video.dataset.src) video.src = video.dataset.src;
+          if (video.src || video.querySelector('source')) return; // Already loaded
+          
+          if (video.dataset.src) {
+            // Create source element for better compatibility
+            const source = document.createElement('source');
+            source.src = video.dataset.src;
+            source.type = 'video/mp4';
+            video.appendChild(source);
+            
+            // Also set direct src as fallback
+            video.src = video.dataset.src;
+          }
         }
 
         video.addEventListener('canplay', () => video.classList.add('is-ready'), { once: true });
-        video.addEventListener('error', () => { /* silently ignore missing/LFS videos */ });
+        video.addEventListener('error', (e) => { console.warn('Video load error:', video.dataset.src, e); });
 
         if (isTouch) {
           observer.observe(card);
@@ -6282,6 +6294,19 @@
 
           if (vSrc) {
             if (!video.src && video.dataset.src) video.src = video.dataset.src;
+            
+            // Clear existing sources
+            const existingSources = modalVideo.querySelectorAll('source');
+            existingSources.forEach(s => s.remove());
+            modalVideo.innerHTML = '';
+            
+            // Add source element for better compatibility
+            const source = document.createElement('source');
+            source.src = vSrc;
+            source.type = 'video/mp4';
+            modalVideo.appendChild(source);
+            
+            // Also set direct src as fallback
             modalVideo.src = vSrc;
           }
           if (titleEl) modalTitle.textContent = titleEl.textContent;
@@ -6298,6 +6323,7 @@
         modalVideo.pause();
         modalVideo.currentTime = 0;
         modalVideo.src = '';
+        modalVideo.innerHTML = '';
       }
 
       if (modalClose) modalClose.addEventListener('click', closeModal);
