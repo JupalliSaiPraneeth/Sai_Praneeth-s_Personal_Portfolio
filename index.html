@@ -3,7 +3,8 @@
 
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover">
+  <meta name="color-scheme" content="dark light">
   <meta name="description" content="SaiPraneeth Jupalli — Frontend Developer, Data Scientist & Web Designer.">
   <title>SaiPraneeth Jupalli | Portfolio</title>
   <link
@@ -1372,12 +1373,12 @@
 
     @media (min-width:1200px) {
       .layout {
-        max-width: 1400px;
-        padding: 32px 24px;
+        max-width: 1200px;
+        padding: 24px 20px;
       }
 
       .hero-container {
-        gap: 80px;
+        gap: 60px;
       }
     }
 
@@ -1807,6 +1808,11 @@
 
     html {
       scroll-behavior: smooth;
+      font-size: 100%;
+      -webkit-text-size-adjust: 100%;
+      -moz-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+      tab-size: 4;
     }
 
     body {
@@ -1816,6 +1822,11 @@
       min-height: 100vh;
       overflow-x: hidden;
       -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      text-rendering: optimizeLegibility;
+      font-feature-settings: 'kern' 1, 'liga' 1, 'calt' 1, 'pnum' 1, 'tnum' 0, 'onum' 0, 'lnum' 1, 'dlig' 0;
+      font-synthesis: none;
+      font-optical-sizing: auto;
       transition: background 0.45s var(--ease), color 0.45s;
       position: relative;
     }
@@ -1890,6 +1901,11 @@
     img {
       max-width: 100%;
       display: block;
+      image-rendering: -webkit-optimize-contrast;
+      image-rendering: crisp-edges;
+      -webkit-backface-visibility: hidden;
+      backface-visibility: hidden;
+      transform: translateZ(0);
     }
 
     button {
@@ -1941,10 +1957,10 @@
       z-index: 1;
       display: flex;
       height: 100vh;
-      max-width: 1300px;
+      max-width: 1200px;
       margin: 0 auto;
-      padding: 28px 20px;
-      gap: 24px;
+      padding: 24px 20px;
+      gap: 22px;
       align-items: flex-start;
       overflow: hidden;
     }
@@ -1962,8 +1978,8 @@
       border-radius: var(--r);
       padding: 32px 24px 24px;
       box-shadow: 0 8px 48px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.06);
-      scrollbar-width: thin;
-      scrollbar-color: var(--bg4) transparent;
+      scrollbar-width: none;
+      scrollbar-color: transparent transparent;
       transition: background 0.45s, border-color 0.45s, box-shadow 0.45s, opacity 0.4s, visibility 0.4s, transform 0.4s;
       display: none;
       opacity: 0;
@@ -1971,6 +1987,13 @@
       transform: translateX(-30px);
       pointer-events: none;
       flex-shrink: 0;
+      will-change: transform, opacity;
+      -webkit-backface-visibility: hidden;
+      backface-visibility: hidden;
+    }
+
+    .sidebar::-webkit-scrollbar {
+      display: none;
     }
 
     .sidebar.visible {
@@ -2422,6 +2445,10 @@
       overflow-x: hidden;
       scrollbar-width: thin;
       scrollbar-color: var(--bg4) transparent;
+      will-change: scroll-position;
+      -webkit-backface-visibility: hidden;
+      backface-visibility: hidden;
+      transform: translateZ(0);
     }
 
     .tab-nav {
@@ -3778,6 +3805,7 @@
       color: var(--accent);
       background: linear-gradient(135deg, var(--accent), var(--accent2));
       -webkit-background-clip: text;
+      background-clip: text;
       -webkit-text-fill-color: transparent;
     }
 
@@ -5411,7 +5439,7 @@
           await _supabase.from('contact_messages').insert([payload]);
 
           // 2. Send Email via existing endpoint
-             // Send directly to your deployed Render backend
+            // Send directly to your deployed Render backend
       const contactUrl = 'https://sai-praneeth-s-portfolio-1.onrender.com/contact';
 
           await fetch(contactUrl, {
